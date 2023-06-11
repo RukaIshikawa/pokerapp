@@ -1,0 +1,64 @@
+<html>
+  <body>
+    <input id="inputText" type="text">
+    <input id="sendButton" type="submit">
+    <input id="idText" type="text">
+    <input id="idButton" type="submit" <--onclick="location.href=''"/--> value="make room">
+    <ul id="messageList" />
+    <ul id="idList" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script>     
+      const socket = io();
+      const clearText = () => {
+        document.getElementById('inputText').value = '';
+      }
+      const clearId = () =>{
+        document.getElementById('idText').value = '';
+      }
+
+      const addMessageList = (test) => {
+        const ul = document.getElementById('messageList');
+        const li = document.createElement('li');
+        const text = document.createTextNode(test);
+        li.appendChild(text);
+        ul.appendChild(li);
+      };
+
+      const addIdList = (inputId) =>{
+        const idul = document.getElementById('idList');
+        const idli = document.createElement('idli');
+        const room = document.createTextNode(inputId);
+        idli.appendChild(room);
+        idul.appendChild(idli);
+      };
+
+      // 送信ボタンのクリックイベントを検知
+      document.getElementById('sendButton').addEventListener('click', () => {
+        // inputに入力されたテキストを取得
+        let inputMessage = document.getElementById('inputText').value;
+        if (inputMessage === '') {
+          return;
+        }
+        // 'sendMessage' イベントを発火、メッセージを送信
+        socket.emit('sendMessage', inputMessage);
+        // input 内のテキストを空にする
+        clearText();
+      });
+        //  'receiveMessage' イベントの発火を検知
+      //  第一引数には受信したメッセージが入る
+      socket.on('receiveMessage', (test) => {
+        // 受信したメッセージをulタグに挿入
+        addMessageList(test);
+      });
+      document.getElementById('idButton').addEventListener('click', () => {
+        let inputId = document.getElementById('idText').value;
+        addIdList(inputId);
+        if (inputId === '') {
+          return;
+        }
+        socket.emit('sendId',inputId);
+        clearId();
+      });
+    </script>
+  </body>
+</html>
